@@ -1,0 +1,6 @@
+# Notes internes : la vitrine ne publie que README, ARCHITECTURE et assets
+CAPTURES.md
+
+# Le gitignore global exclut ces noms : on les réinclut ici
+!ARCHITECTURE.md
+!assets/**
