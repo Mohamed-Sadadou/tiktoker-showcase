@@ -252,17 +252,8 @@ la rétention (format Cours IA Flash, ouvertures et mécaniques animées) et sur
 - **Tests** : environ 160 fonctions de test pytest côté backend, sans jamais appeler le vrai LLM.
 - **Ordre de grandeur** (relevé du 21 octobre 2026) : ~22 000 lignes Python (dont ~3 100 de tests), ~15 700 lignes
   TypeScript côté interface, ~1 400 lignes JavaScript pour les ouvertures et mécaniques animées, environ 130 routes d'API.
-- **Limites** : la mise en ligne sur TikTok est manuelle ; un seul poste, pas de comptes utilisateurs. L'effet du
-  nouveau format sur l'audience n'est pas publié ici : **à mesurer**.
 
 ---
-
-## 🔒 Pourquoi le code est privé
-
-Tiktoker est un outil personnel en évolution rapide, branché sur des services locaux et des comptes personnels.
-Ce dépôt présente le produit et ses choix techniques ; le code n'est pas publié. Les modèles et outils tiers
-restent soumis à leurs propres licences (notamment XTTS-v2, non commercial) ; une voix clonée et une photo
-d'archive ont leurs propres ayants droit. Les vidéos produites sont étiquetées comme contenus générés par IA.
 
 ## 🎬 Démo sur demande
 
