@@ -1,6 +1,6 @@
 # Tiktoker : architecture
 
-*Plongée technique. Présentation générale : [README.md](./README.md). Le code source est privé ; ce document décrit sa structure et son fonctionnement, relevés sur le code au 17 octobre 2026. Captures et vidéo : [README.md](./README.md).*
+*Plongée technique. Présentation générale : [README.md](./README.md). Le code source est privé ; ce document décrit sa structure et son fonctionnement, relevés sur le code au 21 octobre 2026 (travail en cours compris : mode Cours IA Flash, ouvertures et mécaniques animées, import Radar). Captures et vidéo : [README.md](./README.md).*
 
 ---
 
@@ -45,16 +45,16 @@ flowchart TB
 
 ### Surface de l'API
 
-Relevé dans les routeurs : **127 routes** réparties en douze routeurs, plus une route de santé.
+Relevé dans les routeurs : **129 routes** réparties en douze routeurs, plus une route de santé.
 
 | Préfixe | Routes | Rôle |
 |---|---:|---|
 | `/api/projects` | 24 | fichiers, prompts d'image, images, voix (plan et lignes), alignement, vidéo, légende, pipeline, imports |
 | `/api/voices` | 20 | moteurs et échantillons, tests de synthèse, profils, création de voix, lexique de prononciation, aperçu du texte préparé |
-| `/api/scripts` | 19 | CRUD, relecture et réécriture par Claude, ordre du parcours, photo d'archive, restauration, recherche d'archives, production en lot |
+| `/api/scripts` | 20 | CRUD, relecture et réécriture par Claude, passage d'un format à l'autre (Micro-cours IA ↔ Cours IA Flash), photo d'archive, restauration, recherche d'archives, production en lot |
 | `/api/memes` | 11 | bibliothèque de mèmes : ajout, recherche et vérification par Claude, candidats |
 | `/api/system` | 10 | état, GPU, journal des appels LLM, modèles par usage, réglages, mode dégradé, déchargement des modèles |
-| `/api/modes` | 9 | CRUD des modes, réinitialisation, génération de scripts |
+| `/api/modes` | 10 | CRUD des modes, réinitialisation, génération de scripts, import des sujets de Radar |
 | `/api/images` | 8 | atelier d'images : génération libre, image de référence, amélioration de prompt, historique |
 | `/api/jobs` | 7 | liste, activité en direct, arrêt, reprise |
 | `/api/clone` | 7 | échantillons de clonage, génération, sorties |
@@ -81,6 +81,9 @@ Relevé dans les routeurs : **127 routes** réparties en douze routeurs, plus un
 | `align` / `subtitles` | horodatage mot à mot, sous-titres ASS karaoké |
 | `motion` / `motion_styles` | plan de montage, composition HTML/GSAP, rendu Hyperframes, styles éditables |
 | `schemas` | schémas animés : blocs et flèches, tableau tactique, graphiques, chaque étape calée sur un mot |
+| `mechanics` / `mechanics_preview` | registre des mécaniques animées (un dossier par mécanique : fiche + code), validation, aperçu |
+| `openers` | registre des ouvertures animées du format Cours IA Flash |
+| `radar` | import des sujets du flux de Radar (en cours) |
 | `memes` | bibliothèque de mèmes, recherche et vérification par Claude, placement au montage |
 | `montage_check` | vérification image / texte par Claude avant le rendu |
 | `video` | gabarits ffmpeg (Ken Burns, diaporama) |
@@ -348,7 +351,65 @@ La composition motion est un dossier autonome dans le projet, ce qui permet de l
 
 ---
 
-## 10. Archives et intégrité
+## 10. Format de rétention, ouvertures et mécaniques animées
+
+Le mode **Cours IA Flash** (20 à 35 s) est un mode comme les autres : ses règles sont des données (champs, consigne
+d'écriture, grille de relecture, réglages par défaut), le pipeline ne contient aucune branche pour lui.
+
+| Champ du script | Rôle |
+|---|---|
+| `hook` | l'accroche, une phrase de 10 mots au plus, vraie et vérifiable |
+| `hook_punch` | le mot-choc, 2 ou 3 mots, affiché d'un coup à 0,0 s (non lu) |
+| `hook_visual` | l'image choc, qui contient la surprise (non lue) |
+| `hook_motion` | l'ouverture animée posée sur l'image choc entre 1 et 2,5 s (liste lue sur le disque) |
+| `twist` | la rupture, dite vers 1,5 à 2 s |
+| `explanation` | un seul mécanisme, 30 à 55 mots, le pourquoi avant 8 s |
+| `takeaway` | la chute, qui nomme et définit la notion |
+
+Réglages du mode : voix à vitesse normale, accroche dite un peu plus vite, aucun blanc de plus de 0,45 s, storyboard
+court (3 à 5 scènes), temps de lecture des mécaniques laissé à Claude, sans plancher.
+
+```mermaid
+flowchart LR
+    D["Dossiers<br/>mechanics/&lt;id&gt;/ · openers/&lt;id&gt;/<br/>fiche + render.js"] --> REG["Registres<br/>relus quand un fichier change"]
+    REG --> CT["Contrat du storyboard<br/>liste, usages, quand l'éviter, exemple"]
+    CT --> CL["Claude écrit le script<br/>et choisit mécaniques et ouverture"]
+    CL --> V{"Validation<br/>champs, bornes, nombre d'étapes"}
+    V -- "invalide" --> IMG["La scène redevient<br/>une image générée"]
+    V -- "valide" --> TM["Étapes calées<br/>sur les mots de la voix"]
+    TM --> MO["Montage : code injecté<br/>dans la composition"]
+```
+
+- **30 mécaniques** (tokens, attention, convolution, descente de gradient, k-means, quantification…) et
+  **7 ouvertures**. Chaque mécanique dessine dans une zone de 400 × 360 unités avec une API commune ; ajouter une
+  mécanique revient à ajouter un dossier, sans toucher au reste du code ni redémarrer le backend.
+- Le rendu reste **déterministe** : pas de hasard, chaque image dépend seulement du temps.
+- Pour une série, un lancement par **phases** enchaîne toutes les relectures, puis toutes les voix, toutes les images
+  et tous les montages, avec reprise à une phase donnée après une interruption.
+
+## 11. Sujets venus de Radar *(en cours)*
+
+Radar, mon outil de veille IA, sert un flux par abonné. L'import, lancé depuis la page d'un mode :
+
+1. lit le flux non acquitté de l'abonné Tiktoker ;
+2. garde les sujets qui ont un angle TikTok et une **source primaire** (un sujet sans source primaire ne devient
+   jamais une idée de vidéo) ;
+3. crée pour chacun un script **à relire**, sans appel au LLM et sans production ;
+4. acquitte les sujets importés, déjà présents ou écartés ; un sujet prévu pour l'autre mode, ou pas encore analysé
+   par Radar, reste dans le flux.
+
+Le sujet d'origine est gardé avec le script, ce qui évite les doublons.
+
+## 12. Publication
+
+Les vidéos sont publiées sur TikTok. La légende et les hashtags sont écrits par Claude selon le mode, la mise en ligne
+se fait dans TikTok, puis le projet est marqué « publié » (dernier statut de l'échelle d'un projet). **Prévu** : envoi
+en brouillon par l'API officielle de TikTok (portée d'envoi seulement, jetons gardés en local et jamais affichés) ;
+la publication et la programmation resteront manuelles dans TikTok Studio.
+
+---
+
+## 13. Archives et intégrité
 
 Les formats historiques s'appuient sur de vraies photographies, avec des règles explicites :
 
@@ -360,7 +421,7 @@ Les formats historiques s'appuient sur de vraies photographies, avec des règles
 
 ---
 
-## 11. Contraintes de la plateforme
+## 14. Contraintes de la plateforme
 
 | Contrainte | Conséquence |
 |---|---|

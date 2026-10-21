@@ -2,7 +2,7 @@
 
 # 🎬 Tiktoker
 
-**Une fabrique locale de vidéos courtes verticales générées par IA : du sujet au MP4 monté, sous-titré et vérifié, sur une seule carte graphique grand public.**
+**Une fabrique locale de vidéos courtes verticales générées par IA : du sujet au MP4 monté, sous-titré et vérifié, sur une seule carte graphique grand public. En production : ses vidéos sont publiées sur TikTok.**
 
 ![Python](https://img.shields.io/badge/Python-3.12-3776AB?logo=python&logoColor=white)
 ![FastAPI](https://img.shields.io/badge/FastAPI-async-009688?logo=fastapi&logoColor=white)
@@ -11,11 +11,11 @@
 ![Claude](https://img.shields.io/badge/LLM-Claude%20CLI-D97757)
 ![GPU](https://img.shields.io/badge/GPU-RTX%205070%20Ti%2012%20Go-76b900?logo=nvidia&logoColor=white)
 ![Code](https://img.shields.io/badge/code-priv%C3%A9-lightgrey)
-![Statut](https://img.shields.io/badge/statut-actif-brightgreen)
+![Statut](https://img.shields.io/badge/statut-en%20production-brightgreen)
 
-<a href="assets/demo.mp4"><img src="assets/demo.gif" alt="Démo de Tiktoker : script, images, voix, montage motion design et vidéo produite" width="760"></a>
+<a href="assets/demo.mp4"><img src="assets/demo.gif" alt="Démo de Tiktoker : le mode Cours IA Flash, le studio, la chaîne de production, la publication et une vraie vidéo produite" width="760"></a>
 
-*Aperçu animé de la démo (25 s). **[Vidéo en qualité HD](assets/demo.mp4)**, effets sonores sans musique.*
+*Aperçu animé du film (39,6 s). **[Vidéo en qualité HD](assets/demo.mp4)**, effets sonores sans musique, avec la voix de la vidéo montrée. Film black-motion du 21 octobre 2026.*
 
 </div>
 
@@ -34,6 +34,7 @@
 | 🎞️ **Le montage** | Motion design (Hyperframes, HTML + GSAP) : accroche animée, sous-titres calés au mot, encarts, schémas étape par étape, mèmes de réaction, bruitages. |
 | 🔍 **La vérification** | Avant le rendu, Claude regarde chaque plan et le compare à ce que dit la voix ; les images incohérentes sont régénérées. |
 | 🏭 **La production** | Des dizaines de vidéos en file, réparties sur trois files (GPU, LLM, rendu), avec arrêt et reprise sans perte. |
+| 📲 **La publication** | Les vidéos sont **publiées sur TikTok** : légende et hashtags écrits par Claude, mise en ligne dans TikTok, projet marqué « publié » dans Tiktoker. |
 
 Tout le calcul lourd (images, voix, transcription, rendu) tourne **sur la machine**, sur une RTX 5070 Ti de 12 Go.
 Seule l'écriture passe par Claude.
@@ -46,7 +47,7 @@ Chaque type de vidéo est un **mode**, décrit en données et entièrement confi
 script, gabarits, prompts envoyés à Claude, voix, direction artistique, style de montage, grille de relecture et
 garde-fous. Le pipeline est le même pour tous : **aucune branche par mode dans le code**.
 
-Huit modes sont livrés ; on peut les modifier, les dupliquer, les réinitialiser ou en créer de nouveaux.
+Neuf modes sont livrés ; on peut les modifier, les dupliquer, les réinitialiser ou en créer de nouveaux.
 
 | Mode | Principe | Ce qui le distingue |
 |---|---|---|
@@ -56,6 +57,7 @@ Huit modes sont livrés ; on peut les modifier, les dupliquer, les réinitialise
 | ⚔️ **Répliques d'anime** | une réplique, son contexte, sa portée | la voix suit le personnage via un profil · montage « Encre et feu » |
 | 📜 **Histoires** | récits historiques courts | sources, relecture obligatoire · montage « Parchemin et bronze » |
 | 🧠 **Micro-cours IA** | une notion d'IA en 50 à 60 s, en série | schémas animés avec temps de lecture, parcours rangé du plus simple au plus complexe · montage « Labo » |
+| ⚡ **Cours IA Flash** | les mêmes notions en 20 à 35 s, au format de rétention | image choc et mot-choc dès 0,0 s, ouverture animée, un seul mécanisme, relecture notée sur la rétention ; chaque cours passe d'un format à l'autre |
 | 🤪 **Cours IA décalés** | les mêmes notions, ton provocateur | accroche « provocation + verdict », mèmes de réaction choisis par Claude · montage « WTF » |
 | ⚽ **Analyse tactique** | football : un match, une équipe, un système | tableaux tactiques et graphiques animés, sources · montage « Tableau tactique » |
 
@@ -68,10 +70,43 @@ Un mode livré se met à jour quand ses gabarits évoluent, **sans jamais écras
 
 ---
 
+## ⚡ Réglé pour la rétention : le format Cours IA Flash
+
+Tiktoker est en production ; la phase actuelle consiste à adapter le format pour que le spectateur reste. Le mode **Cours IA
+Flash** part d'un constat écrit dans sa consigne : *le spectateur décide en deux secondes s'il reste*. Tout le format
+est construit autour de ces deux secondes, et la relecture le vérifie.
+
+| Moment | Règle du format (écrite dans le mode) |
+|---|---|
+| 0,0 s | une **image choc** en pleine lumière et un **mot-choc** de 2 ou 3 mots ; la voix démarre aussitôt sur une accroche de 10 mots au plus, vraie et vérifiable |
+| 1 à 2,5 s | une **ouverture animée** posée sur l'image choc, qui montre le mécanisme propre à la notion (le filtre qui glisse pour un CNN, les liens d'attention pour un transformer…) |
+| vers 1,5 à 2 s | la **rupture** (« Mais… », « Sauf que… ») qui retourne le choc |
+| avant 8 s | le **pourquoi** : un seul mécanisme, sur le même exemple, en 30 à 55 mots, sans temps mort |
+| fin | la **chute** : la définition qu'on retient, qui nomme la notion |
+
+- **Ouvertures et mécaniques animées** : 7 ouvertures et 30 mécaniques (tokens, attention, convolution, descente de
+  gradient, k-means…), chacune dans son dossier « fiche + code », sur le modèle d'un skill. Claude choisit dans la
+  liste en écrivant le storyboard ; une mécanique mal remplie est refusée par la validation et la scène redevient une
+  image générée. Ajouter une mécanique, c'est ajouter un dossier.
+- **Relecture orientée rétention** : la grille note l'accroche, l'explication et la chute avec des plafonds
+  explicites (accroche en question, faux choc, ouverture d'une autre famille de notions, plus de 85 mots…). Une
+  partie sous 4/5 est réécrite avec une consigne précise ; les autres restent figées.
+- **Deux formats pour une notion** : un cours passe de Micro-cours IA à Cours IA Flash, et retour, sans perdre son sujet.
+- **Lancement par phases** : pour une série, toutes les relectures, puis toutes les voix, puis toutes les images,
+  puis tous les montages, avec reprise à une phase donnée.
+
+<p align="center">
+  <img src="assets/screens/13-mode-cours-ia-flash.png" alt="Le mode Cours IA Flash : cours, vidéos prêtes et publiées" width="49%">
+  <img src="assets/screens/14-studio-format-flash.png" alt="Studio d'un cours IA Flash : accroche, mot-choc, image choc, ouverture animée, relecture notée" width="49%">
+</p>
+
+---
+
 ## 🧭 Le parcours d'une vidéo
 
 ```mermaid
 flowchart LR
+    R[Radar<br/>actualité IA] -.-> A
     A[Sujet] --> B[Script + storyboard<br/>Claude]
     B --> C{Relecture<br/>≥ 4/5 ?}
     C -- non --> D[Réécriture des<br/>parties faibles]
@@ -84,8 +119,12 @@ flowchart LR
     I -- incohérent --> E
     I -- cohérent --> J[Rendu Hyperframes<br/>MP4 1080×1920]
     J --> K[Légende + hashtags]
+    K --> L[Publication<br/>sur TikTok]
 ```
 
+0. **Trouver un sujet** *(en cours de développement)*. Les sujets d'actualité IA repérés par **Radar**, mon outil de
+   veille, peuvent être importés : seuls ceux qui s'appuient sur une source primaire deviennent des scripts, toujours
+   **à relire**, sans appel au LLM ni production automatique.
 1. **Écrire.** Dans un mode, Claude produit un lot de scripts, chacun avec son **storyboard** : 3 à 8 scènes calées
    sur les mots du texte lu, avec le visuel, le mouvement de caméra et la transition. Au-delà de trois scripts, la
    demande est découpée en sujets écrits en parallèle.
@@ -96,7 +135,8 @@ flowchart LR
    demander » enchaîne tout sans pause.
 4. **Vérifier.** Claude compare chaque plan à la voix ; un plan incohérent est régénéré automatiquement, sinon une
    fenêtre de décision s'ouvre depuis n'importe quelle page.
-5. **Publier.** Légende et hashtags générés, MP4 prêt à téléverser.
+5. **Publier.** Légende et hashtags écrits par Claude, MP4 prêt ; la vidéo est mise en ligne dans TikTok, puis le
+   projet est marqué « publié », ce qui permet de suivre ce qui reste à sortir.
 
 <p align="center">
   <img src="assets/screens/01-studio-script.png" alt="Studio : script écrit par Claude" width="49%">
@@ -105,6 +145,10 @@ flowchart LR
 <p align="center">
   <img src="assets/screens/03-studio-voix.png" alt="Studio : voix ligne par ligne" width="49%">
   <img src="assets/screens/06-studio-video-motion.png" alt="Studio : montage motion design" width="49%">
+</p>
+<p align="center">
+  <img src="assets/screens/15-studio-publication-tiktok.png" alt="Studio : onglet Publication, légende TikTok et hashtags" width="49%">
+  <img src="assets/screens/16-production-files.png" alt="Production : les jobs en cours, en direct" width="49%">
 </p>
 
 Chaque vidéo garde un **dossier autonome** (manifeste JSON, images avec prompts et seeds, voix ligne par ligne,
@@ -185,24 +229,31 @@ Plongée détaillée : **[ARCHITECTURE.md](./ARCHITECTURE.md)**.
 | ![Mode : réglages généraux](assets/screens/07-mode-general.png) | ![Mode : prompts Claude](assets/screens/09-mode-prompts.png) |
 | ![Mode : visuel et vidéo](assets/screens/10-mode-visuel.png) | ![Atelier d'images](assets/screens/12-atelier-images.png) |
 
-> **Provenance.** Captures réelles de l'application, prises **le 6 octobre 2026, en lecture seule** (aucune requête
-> d'écriture autorisée pendant la capture). L'interface a évolué depuis : trois modes et les écrans de production,
-> de relecture et de mèmes n'y figurent pas encore. Les deux vidéos montrées dans la démo ont été produites par
-> Tiktoker ; l'une est diffusée sans son (voix clonée non diffusable), l'autre garde sa voix de synthèse libre.
+> **Provenance.** Captures réelles de l'application, **en lecture seule** (aucune requête d'écriture autorisée pendant
+> la capture) : 01 à 12 prises le 6 octobre 2026, 13 à 16 le 21 octobre 2026 sur l'instance en production. La vidéo
+> montrée dans le film (« Le CNN », Cours IA Flash) a été produite par Tiktoker ; sa voix est une voix de synthèse
+> créée par description, qui ne reproduit personne.
 
 ---
 
 ## 📍 État du projet
 
-**Actif.** La refonte en modes génériques est terminée et fusionnée (octobre 2026).
+**En production.** Tiktoker produit en continu et ses vidéos sont publiées sur TikTok ; le travail en cours porte sur
+la rétention (format Cours IA Flash, ouvertures et mécaniques animées) et sur l'import des sujets de Radar.
 
-- **Fait** : huit modes éditables, relecture notée avec boucle d'amélioration, trois files de production avec
-  reprise, montage motion design vérifié par Claude, schémas animés, mèmes de réaction, création et clonage de voix,
-  atelier d'images, recherche et restauration d'archives, accès depuis le téléphone (Wi-Fi ou VPN maillé).
-- **Tests** : environ 140 tests pytest côté backend.
-- **Ordre de grandeur** : ~20 000 lignes Python (tests compris) et ~15 000 lignes TypeScript côté interface.
-- **Limites** : publication arrêtée à l'export MP4 (pas de mise en ligne automatique) ; un seul poste, pas de
-  comptes utilisateurs.
+- **Fait** : neuf modes éditables, relecture notée avec boucle d'amélioration, trois files de production avec
+  reprise, montage motion design vérifié par Claude, schémas, ouvertures et mécaniques animés, mèmes de réaction,
+  création et clonage de voix, atelier d'images, recherche et restauration d'archives, accès depuis le téléphone
+  (Wi-Fi ou VPN maillé).
+- **En cours** : import des sujets de Radar ; les ouvertures, les mécaniques et le mode Cours IA Flash évoluent
+  encore au fil des vidéos publiées.
+- **Prévu** : envoi de la vidéo **en brouillon** sur TikTok par l'API officielle ; la publication et la
+  programmation resteront faites à la main dans TikTok Studio.
+- **Tests** : environ 160 fonctions de test pytest côté backend, sans jamais appeler le vrai LLM.
+- **Ordre de grandeur** (relevé du 21 octobre 2026) : ~22 000 lignes Python (dont ~3 100 de tests), ~15 700 lignes
+  TypeScript côté interface, ~1 400 lignes JavaScript pour les ouvertures et mécaniques animées, environ 130 routes d'API.
+- **Limites** : la mise en ligne sur TikTok est manuelle ; un seul poste, pas de comptes utilisateurs. L'effet du
+  nouveau format sur l'audience n'est pas publié ici : **à mesurer**.
 
 ---
 
